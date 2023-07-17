@@ -1,3 +1,4 @@
+from datetime import datetime
 from slack_sdk import WebClient
 
 
@@ -5,15 +6,16 @@ class SlackBot:
     def __init__(self, token) -> None:
         self.client = WebClient(token)
 
-    def get_channel_id(self, channel_name):
+    def get_channel_id(self, channel_name: str):
         """
         슬랙 채널ID 조회
         """
+        channel_name = channel_name.replace(' ', '-')
         # conversations_list() 메서드 호출
         result = self.client.conversations_list()
         # 채널 정보 딕셔너리 리스트
         channels = result.data['channels']
-        print(channels)
+
         # 채널 명이 'test'인 채널 딕셔너리 쿼리
         channel = list(filter(lambda c: c["name"] == channel_name, channels))[0]
         # 채널ID 파싱
@@ -46,13 +48,52 @@ class SlackBot:
         )
         return result
 
-    def post_message(self, channel_id, text):
+    def post_message(self, channel_id, contents, post_type='blocks'):
         """
         슬랙 채널에 메세지 보내기
         """
+        if len(contents) >= 50:
+            contents = contents[:50]
         # chat_postMessage() 메서드 호출
-        result = self.client.chat_postMessage(
-            channel=channel_id,
-            text=text
-        )
+        if post_type == 'blocks':
+            result = self.client.chat_postMessage(
+                channel=channel_id,
+                blocks=contents
+            )
+        elif post_type == 'text':
+            result = self.client.chat_postMessage(
+                channel=channel_id,
+                text=contents
+            )
+        else:
+            assert False, 'NOT SUPPORTING POST TYPE'
         return result
+
+
+def encode_papers(papers, date):
+	header = {
+		"type": "header",
+		"text": {"type": "plain_text", "text": f"{date} New Papers!"}
+	}
+	encoded = [header]
+	for i, paper in enumerate(papers):
+		block = get_paper_text(paper)
+		encoded.append(block)
+
+	return encoded
+
+
+def get_paper_text(paper):
+	return {
+		"type": "section",
+		"fields": [
+			{
+				"type": "mrkdwn",
+				"text": f"*Title:* \n{paper['title']}"
+			},
+			{
+				"type": "mrkdwn",
+				"text": f"*link:* {paper['link']}"
+			}
+		]
+	}

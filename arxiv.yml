@@ -1,0 +1,26 @@
+AI:
+  arxiv_link_recent: https://arxiv.org/list/cs.AI/recent
+  arxiv_link_all : https://arxiv.org/list/cs.AI/pastweek?show=351
+  slack_channel: arxiv-ai
+  show_id : 351
+
+CV:
+  arxiv_link_recent: https://arxiv.org/list/cs.CV/recent
+  arxiv_link_all : https://arxiv.org/list/cs.CV/pastweek?show=372
+  slack_channel: arxiv-cv
+  show_id: 372
+
+IT:
+  arxiv_link_recent: https://arxiv.org/list/cs.IT/recent
+  arxiv_link_all : https://arxiv.org/list/cs.IT/pastweek?show=67
+  slack_channel: arxiv-it
+  show_id: 67
+
+ML:
+  arxiv_link_recent: https://arxiv.org/list/cs.LG/recent
+  arxiv_link_all : https://arxiv.org/list/cs.LG/pastweek?show=547
+  slack_channel: arxiv-machine-learning
+  show_id: 547
+
+
+
