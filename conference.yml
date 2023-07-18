@@ -1,0 +1,3 @@
+ICML:
+  url : https://icml.cc/virtual/{year}/papers.html?filter=titles
+  slack_channel: icml

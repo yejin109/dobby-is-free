@@ -22,7 +22,7 @@ class SlackBot:
         channel_id = channel["id"]
         return channel_id
 
-    def get_message_ts(self, channel_id, query):
+    def get_thread_id(self, channel_id, query):
         """
         슬랙 채널 내 메세지 조회
         """
@@ -31,22 +31,42 @@ class SlackBot:
         # 채널 내 메세지 정보 딕셔너리 리스트
         messages = result.data['messages']
         # 채널 내 메세지가 query와 일치하는 메세지 딕셔너리 쿼리
-        message = list(filter(lambda m: m["text"]==query, messages))[0]
+        message = list(filter(lambda m: query in m["text"], messages))[0]
         # 해당 메세지ts 파싱
         message_ts = message["ts"]
         return message_ts
 
-    def post_thread_message(self, channel_id, message_ts, text):
+    def post_thread_message(self, channel_id, thread_id, contents, post_type='blocks'):
         """
         슬랙 채널 내 메세지의 Thread에 댓글 달기
         """
         # chat_postMessage() 메서드 호출
-        result = self.client.chat_postMessage(
-            channel=channel_id,
-            text = text,
-            thread_ts = message_ts
-        )
+        if post_type == 'blocks':
+            if not isinstance(contents, list):
+                contents = [contents]
+            if len(contents) >= 50:
+                contents = contents[:50]
+            result = self.client.chat_postMessage(
+                channel=channel_id,
+                blocks=contents,
+                thread_ts=thread_id
+            )
+        elif post_type == 'text':
+            result = self.client.chat_postMessage(
+                channel=channel_id,
+                text=contents,
+                thread_ts=thread_id
+            )
+        else:
+            assert False, 'NOT SUPPORTING POST TYPE'
         return result
+
+        # result = self.client.chat_postMessage(
+        #     channel=channel_id,
+        #     text = text,
+        #     thread_ts = message_ts
+        # )
+        # return result
 
     def post_message(self, channel_id, contents, post_type='blocks'):
         """
@@ -56,6 +76,8 @@ class SlackBot:
             contents = contents[:50]
         # chat_postMessage() 메서드 호출
         if post_type == 'blocks':
+            if not isinstance(contents, list):
+                contents = [contents]
             result = self.client.chat_postMessage(
                 channel=channel_id,
                 blocks=contents
@@ -70,10 +92,10 @@ class SlackBot:
         return result
 
 
-def encode_papers(papers, date):
+def encode_papers(papers, title):
 	header = {
 		"type": "header",
-		"text": {"type": "plain_text", "text": f"{date} New Papers!"}
+		"text": {"type": "plain_text", "text": f"{title} New Papers!"}
 	}
 	encoded = [header]
 	for i, paper in enumerate(papers):
