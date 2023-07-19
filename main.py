@@ -3,7 +3,7 @@ import argparse
 from datetime import datetime
 
 from slack import SlackBot, encode_papers
-from crawl import get_arxiv, get_icml, get_nips, get_aaai
+from crawl import get_arxiv, get_icml, get_nips, get_aaai, get_iclr
 
 
 parser = argparse.ArgumentParser()
@@ -59,6 +59,8 @@ def get_conference_paper_list(_conf, _year, _keyword):
         _papers = get_nips(conferences[_conf]['url'], _year, _keyword)
     elif _conf == 'AAAI':
         _papers = get_aaai(conferences[_conf]['url'], _year, _keyword)
+    elif _conf == 'ICLR':
+        _papers = get_iclr(conferences[_conf]['url'], _year, _keyword)
     else:
         assert False, f"Cannot support cuurent conference"
 

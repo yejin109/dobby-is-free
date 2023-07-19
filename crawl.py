@@ -101,3 +101,26 @@ def get_aaai(url_base, year, keyword: str):
     driver.close()
     assert len(papers) != 0, f"No papers for {keyword} in {year}"
     return papers
+
+
+def get_iclr(url_base, year, keyword: str):
+    keyword = keyword.replace(' ', '+')
+    url = url_base.format(year=year) + f"&search={keyword}"
+    driver = webdriver.Chrome()
+    driver.get(url)
+    time.sleep(10)
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    cards = soup.find('div', 'cards row')
+    # cards = list(filter(lambda d: cards_filter(d), divs))
+
+    papers = list()
+    for card in cards:
+        tag_a = card.find('a')
+        _link = f'https://iclr.cc/virtual/{year}/' + tag_a['href']
+        _title = tag_a.text.strip('\n ')
+        papers.append({'title': _title, 'link': _link})
+    driver.close()
+    assert len(papers) != 0, f"No papers for {keyword} in {year}"
+    return papers
+

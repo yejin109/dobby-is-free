@@ -10,3 +10,6 @@ AAAI:
   url : https://aaai-{year}.virtualchair.net/papers.html?filter=titles
   slack_channel: conf-aaai
 
+ICLR:
+  url : https://iclr.cc/virtual/{year}/papers.html?filter=titles
+  slack_channel: conf-iclr
