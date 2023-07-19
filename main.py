@@ -3,11 +3,11 @@ import argparse
 from datetime import datetime
 
 from slack import SlackBot, encode_papers
-from crawl import get_arxiv, get_icml
+from crawl import get_arxiv, get_icml, get_nips, get_aaai
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--target_arxiv',
+parser.add_argument('--is_arxiv',
                     action=argparse.BooleanOptionalAction)
 parser.add_argument('--arxiv_date',
                     # default=datetime.today().strftime(f"%a, %d %b %Y"),
@@ -15,12 +15,15 @@ parser.add_argument('--arxiv_date',
                     help='format : %a, %d %b %Y such as Mon, 17 Jul 2023'
                     )
 
-parser.add_argument('--target_conf',
+parser.add_argument('--is_conf',
+                    default=True,
                     action=argparse.BooleanOptionalAction)
+parser.add_argument('--target_conf',
+                    default='NIPS')
 parser.add_argument('--conf_year',
                     default=2022)
 parser.add_argument('--conf_keyword',
-                    default="shot")
+                    default="graph")
 
 
 credentials = yaml.load(open('./credentials.yml'), Loader=yaml.FullLoader)
@@ -52,8 +55,12 @@ def get_arxiv_paper_list(_subject, date):
 def get_conference_paper_list(_conf, _year, _keyword):
     if _conf == 'ICML':
         _papers = get_icml(conferences[_conf]['url'], _year, _keyword)
+    elif _conf == 'NIPS':
+        _papers = get_nips(conferences[_conf]['url'], _year, _keyword)
+    elif _conf == 'AAAI':
+        _papers = get_aaai(conferences[_conf]['url'], _year, _keyword)
     else:
-        assert False
+        assert False, f"Cannot support cuurent conference"
 
     return _papers
 
@@ -61,16 +68,16 @@ def get_conference_paper_list(_conf, _year, _keyword):
 if __name__ == '__main__':
     args = parser.parse_args()
     # Arxiv post
-    if args.target_arxiv:
+    if args.is_arxiv:
         print("Arxiv start")
-        # arxiv_exceptions = []
-        arxiv_exceptions = ['AI', "IT", 'CV', 'ML']
+        arxiv_exceptions = []
+        # arxiv_exceptions = ['AI', "IT", 'CV', 'ML']
         for subject in arxivs.keys():
             if subject in arxiv_exceptions:
                 continue
             try:
-                papers = get_arxiv_paper_list(subject, args._arxiv_date)
-                contents = encode_papers(papers, args.date)
+                papers = get_arxiv_paper_list(subject, args.arxiv_date)
+                contents = encode_papers(papers, args.arxiv_date)
                 channel_name = arxivs[subject]['slack_channel']
                 to_slack(channel_name, contents)
                 print(f"{subject} Arxiv DONE")
@@ -79,10 +86,11 @@ if __name__ == '__main__':
                 continue
 
     # Conference
-    if args.target_conf:
+    if args.is_conf:
         print("Conf start")
         conference_exceptions = []
-        for conference in conferences.keys():
+        conference_list = conferences.keys() if args.target_conf is None else [args.target_conf]
+        for conference in conference_list:
             if conference in conference_exceptions:
                 continue
             try:
