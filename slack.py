@@ -72,16 +72,17 @@ class SlackBot:
         """
         슬랙 채널에 메세지 보내기
         """
-        if len(contents) >= 50:
-            contents = contents[:50]
         # chat_postMessage() 메서드 호출
         if post_type == 'blocks':
             if not isinstance(contents, list):
                 contents = [contents]
-            result = self.client.chat_postMessage(
-                channel=channel_id,
-                blocks=contents
-            )
+            for i in range(0, len(contents), 50):
+                blocks = contents[i:i + 50]
+                result = self.client.chat_postMessage(
+                    channel=channel_id,
+                    blocks=blocks
+                )
+                print(f"{i+1}th chunk DONE")
         elif post_type == 'text':
             result = self.client.chat_postMessage(
                 channel=channel_id,

@@ -13,7 +13,7 @@ CV:
 IT:
   arxiv_link_recent: https://arxiv.org/list/cs.IT/recent
   arxiv_link_all : https://arxiv.org/list/cs.IT/pastweek?show=67
-  slack_channel: arxiv-it
+  slack_channel: arxiv-information-theroy
   show_id: 67
 
 ML:

@@ -16,7 +16,6 @@ parser.add_argument('--arxiv_date',
                     )
 
 parser.add_argument('--is_conf',
-                    default=True,
                     action=argparse.BooleanOptionalAction)
 parser.add_argument('--target_conf',
                     default='NIPS')
